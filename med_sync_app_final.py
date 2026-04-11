@@ -1,12 +1,18 @@
 
+import os
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
 
-SUPABASE_URL = "https://slwbhftsdffvsiazhrjg.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsd2JoZnRzZGZmdnNpYXpocmpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2Nzc3NzQsImV4cCI6MjA2MzI1Mzc3NH0.wScgpTbOkRj-Bz-V7IWNvOHBdt_eZ3kpQTr9UGhgz_k"
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", os.environ.get("SUPABASE_URL", ""))
+SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", os.environ.get("SUPABASE_KEY", ""))
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    st.error("Supabase credentials are not configured. Set SUPABASE_URL and SUPABASE_KEY.")
+    st.stop()
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 
 def show_login():
     st.title("Login to Medication Sync App")
@@ -33,6 +39,7 @@ def show_login():
                 st.success("Sign-up successful! Please check your email to confirm.")
             except Exception as e:
                 st.error("Sign-up failed: " + str(e))
+
 
 def calculate_sync_quantities(current_meds, new_med, sync_date):
     results = []
@@ -62,6 +69,7 @@ def calculate_sync_quantities(current_meds, new_med, sync_date):
     })
 
     return results
+
 
 if 'user' not in st.session_state:
     show_login()
