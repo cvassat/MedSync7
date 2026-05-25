@@ -1,4 +1,18 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(pip install *)",
+      "Bash(pip install)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(streamlit *)",
+      "Bash(flake8 *)",
+      "Bash(chmod *)",
+      "Bash(mkdir *)",
+      "Bash(CLAUDE_CODE_REMOTE=* *)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
