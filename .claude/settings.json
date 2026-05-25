@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(pip install *)",
+      "Bash(pip install)",
+      "Bash(python3 *)",
+      "Bash(python *)",
+      "Bash(streamlit *)",
+      "Bash(flake8 *)",
+      "Bash(chmod *)",
+      "Bash(mkdir *)",
+      "Bash(CLAUDE_CODE_REMOTE=* *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
