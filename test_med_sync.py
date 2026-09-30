@@ -89,7 +89,7 @@ def test_sync_date_today_returns_empty():
 
 def test_days_are_counted_as_whole_calendar_days():
     """Tomorrow is exactly one day away regardless of the current time of day."""
-    tomorrow = _future_date(1)
+    tomorrow = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
     new_med = {'name': 'NewMed', 'daily_dose': 3}
     result = calculate_sync_quantities([], new_med, tomorrow)
     assert result[0]['units_needed'] == 3
