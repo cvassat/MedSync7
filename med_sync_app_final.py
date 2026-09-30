@@ -3,6 +3,7 @@ import os
 from datetime import date, datetime
 
 import streamlit as st
+from streamlit.errors import StreamlitSecretNotFoundError
 from supabase import Client, create_client
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ def _setting(name, default):
         return value
     try:
         value = st.secrets.get(name)
-    except Exception:  # no secrets file, or secrets unavailable in this context
+    except StreamlitSecretNotFoundError:
         value = None
     if isinstance(value, str) and value:
         return value

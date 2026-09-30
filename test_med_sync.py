@@ -1,6 +1,9 @@
 import sys
 from datetime import date, datetime, timedelta
+from types import ModuleType
 from unittest.mock import MagicMock
+
+import pytest
 
 # Mock streamlit and supabase before importing the app module so the
 # module-level UI code and Supabase client creation don't execute.
@@ -8,10 +11,19 @@ mock_st = MagicMock()
 mock_st.session_state = {}
 # st.tabs() must return an iterable with enough elements to unpack
 mock_st.tabs.return_value = [MagicMock(), MagicMock()]
+streamlit_errors = ModuleType('streamlit.errors')
+
+
+class StreamlitSecretNotFoundError(Exception):
+    pass
+
+
+streamlit_errors.StreamlitSecretNotFoundError = StreamlitSecretNotFoundError
 sys.modules['streamlit'] = mock_st
+sys.modules['streamlit.errors'] = streamlit_errors
 sys.modules['supabase'] = MagicMock()
 
-from med_sync_app_final import calculate_sync_quantities  # noqa: E402
+from med_sync_app_final import _setting, calculate_sync_quantities  # noqa: E402
 
 
 def _future_date(days=30):
@@ -81,6 +93,17 @@ def test_days_are_counted_as_whole_calendar_days():
     new_med = {'name': 'NewMed', 'daily_dose': 3}
     result = calculate_sync_quantities([], new_med, tomorrow)
     assert result[0]['units_needed'] == 3
+
+
+def test_setting_falls_back_when_secrets_file_is_missing():
+    mock_st.secrets.get.side_effect = StreamlitSecretNotFoundError()
+    assert _setting('MISSING_TEST_SETTING', 'fallback') == 'fallback'
+
+
+def test_setting_propagates_other_secrets_errors():
+    mock_st.secrets.get.side_effect = RuntimeError('invalid secrets configuration')
+    with pytest.raises(RuntimeError, match='invalid secrets configuration'):
+        _setting('BROKEN_TEST_SETTING', 'fallback')
 
 
 def test_multiple_medications():
